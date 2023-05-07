@@ -78,7 +78,7 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 			for i := range str {
 				for {
 					elapsed := time.Since(start)
-					if elapsed >= time.Duration(delay)*time.Millisecond { // 3 - is a time delay between each packet sending
+					if elapsed >= time.Duration(delay)*time.Millisecond {
 						go sendPackets(msgBytes, conn, destAddr, str[i])
 						start = time.Now()
 						break
@@ -115,8 +115,9 @@ func main() {
 	// Create a channel to signal when to start sending packets.
 	sendCh := make(chan string)
 
-	//message := os.Args[1]
-	message := "Hel!"
+	message := os.Args[1]
+	fmt.Printf("MESSAGE: %v\n", message)
+	//message := "Hel!"
 	delay := 1000 // milliseconds
 
 	// Start a goroutine to convert input string to string of bits
