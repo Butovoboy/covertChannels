@@ -86,9 +86,9 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 				}
 			}
 		}
-		time.Sleep(3 * time.Second)
 		break
 	}
+	time.Sleep(3 * time.Second)
 }
 
 func sendPackets(msgBytes []byte, conn net.PacketConn, destAddr *net.IPAddr, b byte) {

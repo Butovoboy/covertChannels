@@ -5,8 +5,28 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"time"
 )
+
+func binaryToASCII(binary string) (string, error) {
+	var ascii string
+
+	for i := 0; i < len(binary); i += 8 {
+		if i+8 > len(binary) {
+			return "", fmt.Errorf("binary string length must be a multiple of 8")
+		}
+
+		value, err := strconv.ParseInt(binary[i:i+8], 2, 64)
+		if err != nil {
+			return "", err
+		}
+
+		ascii += fmt.Sprintf("%c", value)
+	}
+
+	return ascii, nil
+}
 
 func main() {
 
@@ -21,6 +41,8 @@ func main() {
 
 	// Create a buffer to hold incoming packets.
 	receivePacket := make([]byte, 1024)
+
+	binary := ""
 
 	start := time.Now()
 	for {
@@ -44,5 +66,11 @@ func main() {
 		} else {
 			continue
 		}
+		fmt.Printf("Elapsed: %v\n", elapsed)
+		if elapsed >= 3*8*time.Second {
+			break
+		}
 	}
+	message, err := binaryToASCII(binary)
+	fmt.Println(message)
 }
