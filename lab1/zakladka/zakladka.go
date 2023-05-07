@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/rand"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -22,18 +24,19 @@ func strToBits(sendCh chan string, message string) {
 	sendCh <- bits
 }
 
-func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
-	str := <-sendCh
-	fmt.Println(str)
+func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int, traffic bool) {
+	var conn net.PacketConn
+	var err error
 
-	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
+	str := <-sendCh
+
+	conn, err = net.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error listening to ICMP traffic: %v\n", err)
 		os.Exit(1)
 	}
-	defer conn.Close()
-
 	fmt.Println("Starting sending packets by covert channel ...")
+	defer conn.Close()
 
 	// Create a buffer to hold incoming packets.
 	receivePacket := make([]byte, 1024)
@@ -42,12 +45,22 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 	buf := bytes.NewBuffer(nil)
 
 	for {
-		n, _, err := conn.ReadFrom(receivePacket)
-		if err != nil {
-			log.Println(err)
-			continue
+		if traffic {
+			n, _, err := conn.ReadFrom(receivePacket)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			buf.Write(receivePacket[:n])
+		} else {
+			b := make([]byte, 128)
+			// Fill the byte slice with random bytes
+			_, err := rand.Read(b)
+			if err != nil {
+				panic(err)
+			}
+			buf.Write(b)
 		}
-		buf.Write(receivePacket[:n])
 
 		// buffer is full
 		if buf.Len() >= 64 {
@@ -78,7 +91,7 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 			for i := range str {
 				for {
 					elapsed := time.Since(start)
-					if elapsed >= time.Duration(delay)*time.Millisecond { // 3 - is a time delay between each packet sending
+					if elapsed >= time.Duration(delay)*time.Millisecond {
 						go sendPackets(msgBytes, conn, destAddr, str[i])
 						start = time.Now()
 						break
@@ -88,6 +101,10 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 		}
 		break
 	}
+
+	// need to send the last 1 to say that the covert channel is closing and these 0 at the end were last
+	time.Sleep(time.Duration(delay) * time.Millisecond)
+	go sendPackets(make([]byte, 1024), conn, destAddr, '1')
 	time.Sleep(3 * time.Second)
 }
 
@@ -107,23 +124,29 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s Write a string to send\n", os.Args[0])
-		os.Exit(1)
-	}
+	traffic := flag.Bool("traffic", false, "A string to decide to get ICMP trafic or to generate your own")
+
+	flag.Parse()
 
 	// Create a channel to signal when to start sending packets.
 	sendCh := make(chan string)
 
-	//message := os.Args[1]
-	message := "Hel!"
+	var message string
+
+	if *traffic {
+		message = os.Args[2]
+	} else {
+		message = os.Args[1]
+	}
+	fmt.Printf("MESSAGE: %v\n", message)
+	//message := "Hel!"
 	delay := 1000 // milliseconds
 
 	// Start a goroutine to convert input string to string of bits
 	go strToBits(sendCh, message)
 
 	// Start a goroutine to handle incoming packets.
-	go getPackets(sendCh, destAddr, delay)
+	go getPackets(sendCh, destAddr, delay, *traffic)
 
 	time.Sleep(300 * time.Second) // need to run goroutines
 }
