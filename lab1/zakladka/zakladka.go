@@ -25,8 +25,6 @@ func strToBits(sendCh chan string, message string) {
 func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 	str := <-sendCh
 	fmt.Println(str)
-	// Wait for signal from user to start sending packets.
-	fmt.Println("Starting to send packets...")
 
 	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
@@ -35,7 +33,7 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 	}
 	defer conn.Close()
 
-	fmt.Println("Listening to ICMP traffic...")
+	fmt.Println("Starting sending packets by covert channel ...")
 
 	// Create a buffer to hold incoming packets.
 	receivePacket := make([]byte, 1024)
@@ -82,7 +80,6 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 					elapsed := time.Since(start)
 					if elapsed >= time.Duration(delay)*time.Millisecond { // 3 - is a time delay between each packet sending
 						go sendPackets(msgBytes, conn, destAddr, str[i])
-						fmt.Printf("DELAY: %v, byte - %v\n", time.Since(start), str[i])
 						start = time.Now()
 						break
 					}
@@ -118,15 +115,15 @@ func main() {
 	// Create a channel to signal when to start sending packets.
 	sendCh := make(chan string)
 
+	//message := os.Args[1]
+	message := "Hel!"
 	delay := 1000 // milliseconds
 
 	// Start a goroutine to convert input string to string of bits
-	go strToBits(sendCh, os.Args[1])
+	go strToBits(sendCh, message)
 
 	// Start a goroutine to handle incoming packets.
 	go getPackets(sendCh, destAddr, delay)
-
-	fmt.Printf("The message has been sent by covert channel!")
 
 	time.Sleep(300 * time.Second) // need to run goroutines
 }
