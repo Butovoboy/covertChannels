@@ -65,7 +65,7 @@ func main() {
 		if elapsed >= time.Duration(delay-10)*time.Millisecond { // 3 - is a time delay between each packet sending
 
 			zeros := int(time.Since(start).Round(time.Millisecond).Milliseconds()) / delay
-			fmt.Printf("ZEROZ: %v\n", zeros)
+			fmt.Printf("ZEROZ: %v\n", int(time.Since(start).Round(time.Millisecond).Milliseconds()))
 			for i := 1; i < zeros; i++ {
 				binary = binary + "0"
 			}
