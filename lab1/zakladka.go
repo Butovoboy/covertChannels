@@ -19,7 +19,6 @@ func strToBits(sendCh chan string, message string) {
 	for _, char := range message {
 		bits += fmt.Sprintf("%08b", char)
 	}
-	fmt.Println(bits)
 	sendCh <- bits
 }
 
@@ -42,6 +41,7 @@ func sendPackets(sendCh chan string, destAddr *net.IPAddr) {
 		fmt.Fprintf(os.Stderr, "Error listening to ICMP traffic: %v\n", err)
 		os.Exit(1)
 	}
+	defer conn.Close()
 
 	fmt.Println("Listening to ICMP traffic...")
 
@@ -60,7 +60,8 @@ func sendPackets(sendCh chan string, destAddr *net.IPAddr) {
 		buf.Write(receivePacket[:n])
 
 		// buffer is full
-		if buf.Len() >= 1024 {
+		if buf.Len() >= 512 {
+			fmt.Println(buf.String())
 			data := buf.Bytes() // Buffer is full => send data to a new ICMP packet
 			buf.Reset()         // Clear the buffer to next data
 
@@ -110,5 +111,5 @@ func main() {
 	fmt.Println("Debug msg...")
 	// Start a goroutine to handle incoming packets.
 	go sendPackets(sendCh, destAddr)
-	time.Sleep(15 * time.Second)
+	time.Sleep(30 * time.Second)
 }
