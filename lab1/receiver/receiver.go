@@ -28,10 +28,10 @@ func main() {
 
 		elapsed := time.Since(start)
 		if elapsed >= 2990*time.Millisecond { // 3 - is a time delay between each packet sending
-			fmt.Printf("Elapsed time - %v\n", elapsed)
+			//fmt.Printf("Elapsed time - %v\n", elapsed)
 
 			zeros := int(time.Since(start).Round(time.Second).Seconds()) / 3
-			for i := 0; i < zeros; i++ {
+			for i := 1; i < zeros; i++ {
 				fmt.Printf("It was 0\n")
 			}
 
