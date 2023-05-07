@@ -88,6 +88,10 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 		}
 		break
 	}
+
+	// need to send the last 1 to say that the covert channel is closing and these 0 at the end were last
+	time.Sleep(time.Duration(delay) * time.Millisecond)
+	go sendPackets(make([]byte, 1024), conn, destAddr, '1')
 	time.Sleep(3 * time.Second)
 }
 
