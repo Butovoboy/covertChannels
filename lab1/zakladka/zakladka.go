@@ -22,7 +22,7 @@ func strToBits(sendCh chan string, message string) {
 	sendCh <- bits
 }
 
-func getPackets(sendCh chan string, destAddr *net.IPAddr) {
+func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 	str := <-sendCh
 	fmt.Println(str)
 	// Wait for signal from user to start sending packets.
@@ -80,7 +80,7 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 			for i := range str {
 				for {
 					elapsed := time.Since(start)
-					if elapsed >= 3*time.Second { // 3 - is a time delay between each packet sending
+					if elapsed >= time.Duration(delay)*time.Millisecond { // 3 - is a time delay between each packet sending
 						go sendPackets(msgBytes, conn, destAddr, str[i])
 						fmt.Printf("DELAY: %v, byte - %v\n", time.Since(start), str[i])
 						start = time.Now()
@@ -120,11 +120,12 @@ func main() {
 
 	//message := os.Args[1]
 	message := "he llo"
+	delay := 500 // milliseconds
 	// Start a goroutine to convert input string to string of bits
 	go strToBits(sendCh, message)
 
 	fmt.Println("Debug msg...")
 	// Start a goroutine to handle incoming packets.
-	go getPackets(sendCh, destAddr)
-	time.Sleep(3000 * time.Second) // need to run goroutines
+	go getPackets(sendCh, destAddr, delay)
+	time.Sleep(300 * time.Second) // need to run goroutines
 }
