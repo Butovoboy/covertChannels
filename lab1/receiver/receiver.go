@@ -67,7 +67,7 @@ func main() {
 			zeros := int(time.Since(start).Round(time.Second).Seconds()) / delay
 			for i := 1; i < zeros; i++ {
 				binary = binary + "0"
-				fmt.Printf("Now binary is %v\n", binary)
+				//fmt.Printf("Now binary is %v\n", binary)
 			}
 
 			if err != nil {
@@ -75,7 +75,6 @@ func main() {
 				continue
 			}
 			binary = binary + "1"
-			fmt.Printf("Now binary is %v\n", binary)
 			if len(binary) >= 8 {
 				rest, character := cutByte(binary)
 				binary = rest
