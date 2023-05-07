@@ -38,7 +38,7 @@ func cutByte(s string) (string, string) {
 
 func main() {
 
-	delay := 3000 // milliseconds
+	delay := 1 // milliseconds
 
 	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
@@ -63,9 +63,9 @@ func main() {
 
 		elapsed := time.Since(start)
 
-		if elapsed >= time.Duration(delay-10)*time.Millisecond { // 3 - is a time delay between each packet sending
+		if elapsed >= time.Duration(delay*1000-10)*time.Millisecond { // 3 - is a time delay between each packet sending
 
-			zeros := int(time.Since(start).Round(time.Millisecond)) / delay
+			zeros := int(time.Since(start).Round(time.Second).Seconds()) / delay
 			fmt.Printf("ZEROZ0: %v\n", zeros)
 			zeros = int(math.Round(float64(zeros)/500.0)) * 500
 			fmt.Printf("ZEROZ: %v\n", zeros)
