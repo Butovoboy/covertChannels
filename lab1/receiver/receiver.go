@@ -32,14 +32,14 @@ func main() {
 
 			zeros := int(time.Since(start).Round(time.Second).Seconds()) / 3
 			for i := 1; i < zeros; i++ {
-				fmt.Printf("It was 0\n")
+				fmt.Printf("0")
 			}
 
 			if err != nil {
 				log.Println(err)
 				continue
 			}
-			fmt.Printf("It was 1\n")
+			fmt.Printf("1")
 			start = time.Now()
 		} else {
 			continue
