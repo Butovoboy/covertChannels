@@ -86,6 +86,8 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 				}
 			}
 		}
+		time.Sleep(3 * time.Second)
+		break
 	}
 }
 
@@ -100,7 +102,7 @@ func sendPackets(msgBytes []byte, conn net.PacketConn, destAddr *net.IPAddr, b b
 
 func main() {
 	// IPv4 address of destination point (tbh the best variant would be to inspect ICMP packets to get DestIP, but may be later)
-	destAddr, err := net.ResolveIPAddr("ip4", "3.72.181.255")
+	destAddr, err := net.ResolveIPAddr("ip4", "192.168.3.17")
 	if err != nil {
 		log.Fatal(err)
 	}
