@@ -53,7 +53,6 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 
 		// buffer is full
 		if buf.Len() >= 64 {
-			fmt.Println(buf.String())
 			data := buf.Bytes() // Buffer is full => send data to a new ICMP packet
 			buf.Reset()         // Clear the buffer to next data
 
