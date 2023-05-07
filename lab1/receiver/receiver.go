@@ -24,22 +24,22 @@ func main() {
 
 	start := time.Now()
 	for {
-		n, _, err := conn.ReadFrom(receivePacket)
+		_, _, err := conn.ReadFrom(receivePacket)
 
 		elapsed := time.Since(start)
 		if elapsed >= 2990*time.Millisecond { // 3 - is a time delay between each packet sending
 			fmt.Printf("Elapsed time - %v\n", elapsed)
+
+			zeros := int(time.Since(start).Round(time.Second).Seconds()) / 3
+			for i := 0; i < zeros; i++ {
+				fmt.Printf("It was 0\n")
+			}
+
 			if err != nil {
 				log.Println(err)
 				continue
 			}
-			fmt.Printf("data - %v\n", n)
-			if n > 0 {
-				fmt.Printf("It was 1\n")
-				start = time.Now()
-				continue
-			}
-			fmt.Printf("It was 0\n")
+			fmt.Printf("It was 1\n")
 			start = time.Now()
 		} else {
 			continue
