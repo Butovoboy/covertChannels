@@ -51,6 +51,8 @@ func main() {
 
 	binary := ""
 
+	_, _, err = conn.ReadFrom(receivePacket)
+
 	start := time.Now()
 
 	for {

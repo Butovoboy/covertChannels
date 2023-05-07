@@ -73,6 +73,9 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 
 			start := time.Now()
 
+			// says that covert channel starts working
+			go sendPackets(msgBytes, conn, destAddr, '1')
+
 			// sending covert message
 			for i := range str {
 				for {
