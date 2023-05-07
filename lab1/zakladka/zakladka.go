@@ -73,6 +73,9 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 
 			start := time.Now()
 
+			// says that covert channel starts working
+			go sendPackets(msgBytes, conn, destAddr, '1')
+
 			// sending covert message
 			for i := range str {
 				for {
@@ -86,9 +89,9 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 				}
 			}
 		}
-		time.Sleep(3 * time.Second)
 		break
 	}
+	time.Sleep(3 * time.Second)
 }
 
 func sendPackets(msgBytes []byte, conn net.PacketConn, destAddr *net.IPAddr, b byte) {
@@ -116,7 +119,7 @@ func main() {
 	sendCh := make(chan string)
 
 	//message := os.Args[1]
-	message := "hello"
+	message := "he llo"
 	// Start a goroutine to convert input string to string of bits
 	go strToBits(sendCh, message)
 
