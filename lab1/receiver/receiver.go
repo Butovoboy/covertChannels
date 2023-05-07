@@ -37,7 +37,7 @@ func cutByte(s string) (string, string) {
 
 func main() {
 
-	delay := 1 // milliseconds
+	delay := 1000 // milliseconds
 
 	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
@@ -62,12 +62,12 @@ func main() {
 
 		elapsed := time.Since(start)
 
-		if elapsed >= time.Duration(delay*1000-10)*time.Millisecond { // 3 - is a time delay between each packet sending
+		if elapsed >= time.Duration(delay-10)*time.Millisecond { // 3 - is a time delay between each packet sending
 
-			zeros := int(time.Since(start).Round(time.Second).Seconds()) / delay
+			zeros := int(time.Since(start).Round(time.Millisecond).Milliseconds()) / delay
 			for i := 1; i < zeros; i++ {
 				binary = binary + "0"
-				//fmt.Printf("Now binary is %v\n", binary)
+				fmt.Printf("Now binary is %v\n", binary)
 			}
 
 			if err != nil {
@@ -75,6 +75,7 @@ func main() {
 				continue
 			}
 			binary = binary + "1"
+			fmt.Printf("Now binary is %v\n", binary)
 			if len(binary) >= 8 {
 				rest, character := cutByte(binary)
 				binary = rest
