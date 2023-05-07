@@ -17,6 +17,8 @@ func main() {
 	}
 	defer conn.Close()
 
+	fmt.Println("Listening to ICMP traffic...")
+
 	// Create a buffer to hold incoming packets.
 	receivePacket := make([]byte, 1024)
 
@@ -31,10 +33,11 @@ func main() {
 				continue
 			}
 
+			fmt.Printf("data - %v\n", n)
 			if n > 0 {
-				fmt.Printf("It was 1")
+				fmt.Printf("It was 1\n")
 			} else {
-				fmt.Printf("It was 0")
+				fmt.Printf("It was 0\n")
 			}
 
 			start = time.Now()
