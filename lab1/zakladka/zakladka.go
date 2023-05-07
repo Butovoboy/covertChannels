@@ -120,7 +120,7 @@ func main() {
 
 	//message := os.Args[1]
 	message := "he llo from Moscow"
-	delay := 3000 // milliseconds
+	delay := 1000 // milliseconds
 	// Start a goroutine to convert input string to string of bits
 	go strToBits(sendCh, message)
 

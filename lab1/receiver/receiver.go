@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 	"net"
 	"os"
 	"strconv"
@@ -66,11 +65,9 @@ func main() {
 		if elapsed >= time.Duration(delay*1000-10)*time.Millisecond { // 3 - is a time delay between each packet sending
 
 			zeros := int(time.Since(start).Round(time.Second).Seconds()) / delay
-			fmt.Printf("ZEROZ0: %v\n", zeros)
-			zeros = int(math.Round(float64(zeros)/500.0)) * 500
-			fmt.Printf("ZEROZ: %v\n", zeros)
 			for i := 1; i < zeros; i++ {
 				binary = binary + "0"
+				fmt.Printf("Now binary is %v\n", binary)
 			}
 
 			if err != nil {
@@ -78,6 +75,7 @@ func main() {
 				continue
 			}
 			binary = binary + "1"
+			fmt.Printf("Now binary is %v\n", binary)
 			if len(binary) >= 8 {
 				rest, character := cutByte(binary)
 				binary = rest
