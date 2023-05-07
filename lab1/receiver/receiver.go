@@ -28,6 +28,13 @@ func binaryToASCII(binary string) error {
 	return nil
 }
 
+func cutByte(s string) (string, string) {
+	if len(s) < 8 {
+		return "", ""
+	}
+	return s[8:], s[:8]
+}
+
 func main() {
 
 	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
@@ -54,8 +61,8 @@ func main() {
 
 			zeros := int(time.Since(start).Round(time.Second).Seconds()) / 3
 			for i := 1; i < zeros; i++ {
-				binary += fmt.Sprintf("0")
-				fmt.Printf(binary)
+				binary = binary + "0"
+				fmt.Printf("Now binary is %v\n", binary)
 			}
 
 			if err != nil {
@@ -63,10 +70,12 @@ func main() {
 				continue
 			}
 			binary = binary + "1"
-			binary += fmt.Sprintf("1")
+			fmt.Printf("Now binary is %v\n", binary)
 			if len(binary) == 8 {
-				go binaryToASCII(binary)
-				binary = ""
+				rest, character := cutByte(binary)
+				binary = rest
+				fmt.Printf("Now binary is %v\n", binary)
+				go binaryToASCII(character)
 			}
 			start = time.Now()
 		} else {
