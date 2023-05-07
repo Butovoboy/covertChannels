@@ -27,9 +27,10 @@ func main() {
 		n, _, err := conn.ReadFrom(receivePacket)
 
 		elapsed := time.Since(start)
-		if elapsed >= 2920*time.Millisecond { // 3 - is a time delay between each packet sending
+		if elapsed >= 2990*time.Millisecond { // 3 - is a time delay between each packet sending
 			if err != nil {
 				log.Println(err)
+				fmt.Printf("It was 0\n")
 				continue
 			}
 

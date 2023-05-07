@@ -86,6 +86,7 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 				}
 			}
 		}
+		time.Sleep(3 * time.Second)
 		break
 	}
 }
