@@ -86,6 +86,7 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 				}
 			}
 		}
+		break
 	}
 }
 
