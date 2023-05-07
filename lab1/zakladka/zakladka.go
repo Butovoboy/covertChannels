@@ -116,7 +116,7 @@ func main() {
 	sendCh := make(chan string)
 
 	//message := os.Args[1]
-	message := "hello"
+	message := "he llo"
 	// Start a goroutine to convert input string to string of bits
 	go strToBits(sendCh, message)
 
