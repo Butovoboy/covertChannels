@@ -55,12 +55,14 @@ func main() {
 			zeros := int(time.Since(start).Round(time.Second).Seconds()) / 3
 			for i := 1; i < zeros; i++ {
 				binary += fmt.Sprintf("0")
+				fmt.Printf(binary)
 			}
 
 			if err != nil {
 				log.Println(err)
 				continue
 			}
+			binary = binary + "1"
 			binary += fmt.Sprintf("1")
 			if len(binary) == 8 {
 				go binaryToASCII(binary)
