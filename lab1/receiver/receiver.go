@@ -51,13 +51,13 @@ func main() {
 
 	binary := ""
 
+	_, _, err = conn.ReadFrom(receivePacket)
 	start := time.Now()
-	for {
-		_, _, err := conn.ReadFrom(receivePacket)
 
+	for {
 		elapsed := time.Since(start)
+
 		if elapsed >= 2990*time.Millisecond { // 3 - is a time delay between each packet sending
-			//fmt.Printf("Elapsed time - %v\n", elapsed)
 
 			zeros := int(time.Since(start).Round(time.Second).Seconds()) / 3
 			for i := 1; i < zeros; i++ {
@@ -71,15 +71,14 @@ func main() {
 			}
 			binary = binary + "1"
 			fmt.Printf("Now binary is %v\n", binary)
-			if len(binary) == 8 {
+			if len(binary) >= 8 {
 				rest, character := cutByte(binary)
 				binary = rest
 				fmt.Printf("Now binary is %v\n", binary)
 				go binaryToASCII(character)
 			}
 			start = time.Now()
-		} else {
-			continue
 		}
+		_, _, err = conn.ReadFrom(receivePacket)
 	}
 }
