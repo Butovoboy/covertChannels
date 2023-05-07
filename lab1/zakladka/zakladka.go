@@ -110,21 +110,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//	if len(os.Args) != 2 {
-	//		fmt.Fprintf(os.Stderr, "Usage: %s Write a string to send\n", os.Args[0])
-	//		os.Exit(1)
-	//	}
+	if len(os.Args) != 2 {
+		fmt.Fprintf(os.Stderr, "Usage: %s Write a string to send\n", os.Args[0])
+		os.Exit(1)
+	}
 
 	// Create a channel to signal when to start sending packets.
 	sendCh := make(chan string)
 
-	//message := os.Args[1]
-	message := "Hello from Moscow!"
 	delay := 1000 // milliseconds
+
 	// Start a goroutine to convert input string to string of bits
-	go strToBits(sendCh, message)
+	go strToBits(sendCh, os.Args[1])
 
 	// Start a goroutine to handle incoming packets.
 	go getPackets(sendCh, destAddr, delay)
+
+	fmt.Printf("The message has been sent by covert channel!")
+
 	time.Sleep(300 * time.Second) // need to run goroutines
 }
