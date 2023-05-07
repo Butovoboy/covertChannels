@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/rand"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -22,18 +24,19 @@ func strToBits(sendCh chan string, message string) {
 	sendCh <- bits
 }
 
-func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
-	str := <-sendCh
-	fmt.Println(str)
+func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int, traffic bool) {
+	var conn net.PacketConn
+	var err error
 
-	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
+	str := <-sendCh
+
+	conn, err = net.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error listening to ICMP traffic: %v\n", err)
 		os.Exit(1)
 	}
-	defer conn.Close()
-
 	fmt.Println("Starting sending packets by covert channel ...")
+	defer conn.Close()
 
 	// Create a buffer to hold incoming packets.
 	receivePacket := make([]byte, 1024)
@@ -42,12 +45,22 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int) {
 	buf := bytes.NewBuffer(nil)
 
 	for {
-		n, _, err := conn.ReadFrom(receivePacket)
-		if err != nil {
-			log.Println(err)
-			continue
+		if traffic {
+			n, _, err := conn.ReadFrom(receivePacket)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			buf.Write(receivePacket[:n])
+		} else {
+			b := make([]byte, 128)
+			// Fill the byte slice with random bytes
+			_, err := rand.Read(b)
+			if err != nil {
+				panic(err)
+			}
+			buf.Write(b)
 		}
-		buf.Write(receivePacket[:n])
 
 		// buffer is full
 		if buf.Len() >= 64 {
@@ -111,10 +124,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s Write a string to send\n", os.Args[0])
-		os.Exit(1)
-	}
+	// if the flag --trafic is not specified or equals "connect" then we connect to provided the ICMP stream;
+	// in all other cases we generate owr own traffic to send data in Covert Channel over this self-generated traffic
+	traffic := flag.Bool("traffic", false, "A string to decide to get ICMP trafic or to generate your own")
+
+	flag.Parse()
 
 	// Create a channel to signal when to start sending packets.
 	sendCh := make(chan string)
@@ -128,7 +142,7 @@ func main() {
 	go strToBits(sendCh, message)
 
 	// Start a goroutine to handle incoming packets.
-	go getPackets(sendCh, destAddr, delay)
+	go getPackets(sendCh, destAddr, delay, *traffic)
 
 	time.Sleep(300 * time.Second) // need to run goroutines
 }
