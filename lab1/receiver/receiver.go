@@ -28,12 +28,11 @@ func main() {
 
 		elapsed := time.Since(start)
 		if elapsed >= 2990*time.Millisecond { // 3 - is a time delay between each packet sending
+			fmt.Printf("Elapsed time - %v\n", elapsed)
 			if err != nil {
 				log.Println(err)
-				fmt.Printf("It was 0\n")
 				continue
 			}
-
 			fmt.Printf("data - %v\n", n)
 			if n > 0 {
 				fmt.Printf("It was 1\n")
