@@ -119,8 +119,8 @@ func main() {
 	sendCh := make(chan string)
 
 	//message := os.Args[1]
-	message := "he llo"
-	delay := 500 // milliseconds
+	message := "he llo from Moscow"
+	delay := 3000 // milliseconds
 	// Start a goroutine to convert input string to string of bits
 	go strToBits(sendCh, message)
 
