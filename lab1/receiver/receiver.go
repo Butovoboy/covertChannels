@@ -52,20 +52,11 @@ func main() {
 	binary := ""
 
 	start := time.Now()
-	startLack := time.Now()
-
-	var elapsed time.Duration
-	t := time.Time{}
 
 	for {
 		_, _, err = conn.ReadFrom(receivePacket)
 
-		if startLack != t {
-			start = time.Now()
-			startLack = t
-		}
-
-		elapsed = time.Since(start)
+		elapsed := time.Since(start)
 
 		if elapsed >= 2990*time.Millisecond { // 3 - is a time delay between each packet sending
 
