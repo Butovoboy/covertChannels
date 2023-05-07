@@ -124,8 +124,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// if the flag --trafic is not specified or equals "connect" then we connect to provided the ICMP stream;
-	// in all other cases we generate owr own traffic to send data in Covert Channel over this self-generated traffic
 	traffic := flag.Bool("traffic", false, "A string to decide to get ICMP trafic or to generate your own")
 
 	flag.Parse()
@@ -133,7 +131,13 @@ func main() {
 	// Create a channel to signal when to start sending packets.
 	sendCh := make(chan string)
 
-	message := os.Args[1]
+	var message string
+
+	if *traffic {
+		message = os.Args[2]
+	} else {
+		message = os.Args[1]
+	}
 	fmt.Printf("MESSAGE: %v\n", message)
 	//message := "Hel!"
 	delay := 1000 // milliseconds

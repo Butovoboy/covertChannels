@@ -2,8 +2,8 @@
 
 It containts two programs that run separately on different devices.
 
-The first is `./zakladka/zakladka.go` is a realisation of trafic modification program that sends ICMP packets depending on the rule to reproduce time covert channel.
-`zakladka.go` has one flag `-trafic` which is false by deafult. When it is false the program will generate it's own trafic to create Covert Channel. In case if you will specify flag `trafic` then the program will wait for ICMP traffic to bufferize it and send to `receiver.go` in with some special timeouts.
+The first is `./zakladka/zakladka.go` is a realisation of traffic modification program that sends ICMP packets depending on the rule to reproduce time covert channel.
+`zakladka.go` has one flag `-traffic` which is false by deafult. When it is false the program will generate it's own traffic to create Covert Channel. In case if you will specify flag `traffic` then the program will wait for ICMP traffic to bufferize it and send to `receiver.go` in with some special timeouts.
 The only argument that the program needs is message. Here is the example of `zakladka.go` run:
 
 ```
