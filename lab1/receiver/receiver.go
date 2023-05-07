@@ -67,7 +67,7 @@ func main() {
 
 			zeros := int(time.Since(start).Round(time.Millisecond).Milliseconds()) / delay
 			zeros = int(math.Round(float64(zeros)/500.0)) * 500
-			fmt.Printf("ZEROZ: %v\n", int(time.Since(start).Round(time.Millisecond).Milliseconds()))
+			fmt.Printf("ZEROZ: %v\n", zeros)
 			for i := 1; i < zeros; i++ {
 				binary = binary + "0"
 			}
