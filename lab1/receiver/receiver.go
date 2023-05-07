@@ -61,11 +61,11 @@ func main() {
 		_, _, err = conn.ReadFrom(receivePacket)
 
 		if startLack != t {
-			elapsed = time.Since(startLack)
+			start = time.Now()
 			startLack = t
-		} else {
-			elapsed = time.Since(start)
 		}
+
+		elapsed = time.Since(start)
 
 		if elapsed >= 2990*time.Millisecond { // 3 - is a time delay between each packet sending
 
