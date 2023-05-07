@@ -22,19 +22,11 @@ func strToBits(sendCh chan string, message string) {
 	sendCh <- bits
 }
 
-func sendPackets(sendCh chan string, destAddr *net.IPAddr) {
+func getPackets(sendCh chan string, destAddr *net.IPAddr) {
 	str := <-sendCh
 	fmt.Println(str)
 	// Wait for signal from user to start sending packets.
 	fmt.Println("Starting to send packets...")
-
-	//for _, bit := range str {
-	//	if bit == '1' {
-	//		fmt.Print("a")
-	//	} else {
-	//		fmt.Print("b")
-	//	}
-	//}
 
 	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
@@ -60,7 +52,7 @@ func sendPackets(sendCh chan string, destAddr *net.IPAddr) {
 		buf.Write(receivePacket[:n])
 
 		// buffer is full
-		if buf.Len() >= 512 {
+		if buf.Len() >= 64 {
 			fmt.Println(buf.String())
 			data := buf.Bytes() // Buffer is full => send data to a new ICMP packet
 			buf.Reset()         // Clear the buffer to next data
@@ -80,10 +72,29 @@ func sendPackets(sendCh chan string, destAddr *net.IPAddr) {
 				log.Fatal(err)
 			}
 
-			_, err = conn.WriteTo(msgBytes, destAddr)
-			if err != nil {
-				log.Fatal(err)
+			start := time.Now()
+
+			// sending covert message
+			for i := range str {
+				for {
+					elapsed := time.Since(start)
+					if elapsed >= 3*time.Second { // 3 - is a time delay between each packet sending
+						go sendPackets(msgBytes, conn, destAddr, str[i])
+						fmt.Printf("DELAY: %v, byte - %v\n", time.Since(start), str[i])
+						start = time.Now()
+						break
+					}
+				}
 			}
+		}
+	}
+}
+
+func sendPackets(msgBytes []byte, conn net.PacketConn, destAddr *net.IPAddr, b byte) {
+	if b == '1' {
+		_, err := conn.WriteTo(msgBytes, destAddr)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 }
@@ -110,6 +121,6 @@ func main() {
 
 	fmt.Println("Debug msg...")
 	// Start a goroutine to handle incoming packets.
-	go sendPackets(sendCh, destAddr)
-	time.Sleep(30 * time.Second)
+	go getPackets(sendCh, destAddr)
+	time.Sleep(3000 * time.Second) // need to run goroutines
 }
