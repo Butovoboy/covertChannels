@@ -6,16 +6,17 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 )
 
-func strToBits(sendCh chan string) {
+func strToBits(sendCh chan string, message string) {
 	fmt.Printf("Converting message to a string of bits\n")
 
 	bits := ""
-	for _, char := range os.Args[1] {
+	for _, char := range message {
 		bits += fmt.Sprintf("%08b", char)
 	}
 	fmt.Println(bits)
@@ -24,6 +25,17 @@ func strToBits(sendCh chan string) {
 
 func sendPackets(sendCh chan string, destAddr *net.IPAddr) {
 	str := <-sendCh
+	fmt.Println(str)
+	// Wait for signal from user to start sending packets.
+	fmt.Println("Starting to send packets...")
+
+	//for _, bit := range str {
+	//	if bit == '1' {
+	//		fmt.Print("a")
+	//	} else {
+	//		fmt.Print("b")
+	//	}
+	//}
 
 	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
@@ -39,17 +51,7 @@ func sendPackets(sendCh chan string, destAddr *net.IPAddr) {
 	// Set up the buffer to hold the incoming data
 	buf := bytes.NewBuffer(nil)
 
-	for _, bit := range str {
-		if bit == '1' {
-			fmt.Print("a")
-		} else {
-			fmt.Print("b")
-		}
-	}
-	fmt.Println("i111")
-
 	for {
-		fmt.Println("qwert")
 		n, _, err := conn.ReadFrom(receivePacket)
 		if err != nil {
 			log.Println(err)
@@ -92,21 +94,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s Write a string to send\n", os.Args[0])
-		os.Exit(1)
-	}
+	//	if len(os.Args) != 2 {
+	//		fmt.Fprintf(os.Stderr, "Usage: %s Write a string to send\n", os.Args[0])
+	//		os.Exit(1)
+	//	}
 
 	// Create a channel to signal when to start sending packets.
 	sendCh := make(chan string)
 
+	//message := os.Args[1]
+	message := "hello"
 	// Start a goroutine to convert input string to string of bits
-	go strToBits(sendCh)
+	go strToBits(sendCh, message)
 
+	fmt.Println("Debug msg...")
 	// Start a goroutine to handle incoming packets.
 	go sendPackets(sendCh, destAddr)
-
-	// Wait for signal from user to start sending packets.
-	<-sendCh
-	fmt.Println("Starting to send packets...")
+	time.Sleep(15 * time.Second)
 }
