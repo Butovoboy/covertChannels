@@ -39,7 +39,7 @@ func getPackets(sendCh chan string, destAddr *net.IPAddr, delay int, traffic boo
 	defer conn.Close()
 
 	// Create a buffer to hold incoming packets.
-	receivePacket := make([]byte, 1024)
+	receivePacket := make([]byte, 4096)
 
 	// Set up the buffer to hold the incoming data
 	buf := bytes.NewBuffer(nil)
