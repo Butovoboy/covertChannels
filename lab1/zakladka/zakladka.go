@@ -139,7 +139,6 @@ func main() {
 		message = os.Args[1]
 	}
 	fmt.Printf("MESSAGE: %v\n", message)
-	//message := "Hel!"
 	delay := 1000 // milliseconds
 
 	// Start a goroutine to convert input string to string of bits

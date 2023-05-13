@@ -37,7 +37,7 @@ func cutByte(s string) (string, string) {
 
 func main() {
 
-	delay := 1 // milliseconds
+	delay := 1 // seconds
 
 	conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {

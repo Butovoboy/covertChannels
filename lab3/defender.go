@@ -38,7 +38,7 @@ func changeSpeed(destAddr *net.IPAddr, delay int) {
 			continue
 		}
 
-		time.Sleep(time.Duration(delay) * time.Second)
+		time.Sleep(time.Duration(delay) * time.Millisecond)
 
 		// Create new IP packet with the same payload
 		newIP := layers.IPv4{
@@ -73,7 +73,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	delay := 2 // seconds
+	delay := 2500 // milliseconds
 
 	go changeSpeed(destAddr, delay)
 
