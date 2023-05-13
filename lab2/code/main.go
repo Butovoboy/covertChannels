@@ -33,6 +33,11 @@ func decodeMessage(dumpFile string) (string, error) {
 		blocks = append(blocks, packet)
 	}
 
+	err = utils.show_gaps(blocks)
+	if err != nil {
+		return "", err
+	}
+
 	message := ""
 	for counter := PacketID; counter < len(blocks); counter++ {
 		difference := blocks[counter].Metadata().Timestamp.Sub(blocks[counter-1].Metadata().Timestamp) // counts the difference in timestamps between neighbour blocks
