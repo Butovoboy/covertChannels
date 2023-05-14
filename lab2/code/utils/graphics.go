@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
@@ -24,7 +25,7 @@ func generateBarItems(intervals map[int]int, sortedKeys []int) []opts.BarData {
 	return items
 }
 
-func Show_gaps(intervals map[int]int, sortedKeys []int) error {
+func Show_gaps(intervals map[int]int, sortedKeys []int, name string) error {
 	// create a new bar instance
 	bar := charts.NewBar()
 	// set some global options like Title/Legend/ToolTip or anything else
@@ -48,7 +49,8 @@ func Show_gaps(intervals map[int]int, sortedKeys []int) error {
 		}),
 	)
 	// Where the magic happens
-	f, _ := os.Create("./images/bar.html")
+	filename := fmt.Sprintf("./images/bar_%s.html", name)
+	f, _ := os.Create(filename)
 	bar.Render(f)
 	return nil
 }

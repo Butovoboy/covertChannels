@@ -45,7 +45,8 @@ func decodeMessage(dumpFile string) (string, error) {
 		message += strconv.Itoa(int(countDifference(blocks, counter).Round(time.Second)) / 1000000000) // reading message in bits
 	}
 
-	createGraphic(blocks)
+	createGraphic(blocks, 1, "all_packets")
+	createGraphic(blocks, PacketID, "covert_packets")
 	res, err := binaryToASCII(message)
 	if err != nil {
 		return "", err
@@ -74,9 +75,9 @@ func sortKeys(intervalsMap map[int]int) []int {
 }
 
 // get a map with numbers of packats with each interval
-func createGraphic(blocks []gopacket.Packet) error {
+func createGraphic(blocks []gopacket.Packet, strt int, name string) error {
 	intervalsMap := make(map[int]int)
-	for counter := 1; counter < len(blocks); counter++ {
+	for counter := strt; counter < len(blocks); counter++ {
 		interval := int(countDifference(blocks, counter).Round(250*time.Millisecond) / 1000000)
 		_, exists := intervalsMap[interval]
 		if exists {
@@ -86,7 +87,7 @@ func createGraphic(blocks []gopacket.Packet) error {
 		}
 	}
 
-	err := utils.Show_gaps(intervalsMap, sortKeys(intervalsMap))
+	err := utils.Show_gaps(intervalsMap, sortKeys(intervalsMap), name)
 	if err != nil {
 		return err
 	}
