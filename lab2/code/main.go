@@ -3,11 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcapgo"
+
+	"decoder/utils"
 )
 
 const (
@@ -33,23 +36,62 @@ func decodeMessage(dumpFile string) (string, error) {
 		blocks = append(blocks, packet)
 	}
 
-	err = utils.show_gaps(blocks)
 	if err != nil {
 		return "", err
 	}
 
 	message := ""
 	for counter := PacketID; counter < len(blocks); counter++ {
-		difference := blocks[counter].Metadata().Timestamp.Sub(blocks[counter-1].Metadata().Timestamp) // counts the difference in timestamps between neighbour blocks
-		message += strconv.Itoa(int(difference.Round(time.Second)) / 1000000000)                       // reading message in bits
+		message += strconv.Itoa(int(countDifference(blocks, counter).Round(time.Second)) / 1000000000) // reading message in bits
 	}
 
+	createGraphic(blocks)
 	res, err := binaryToASCII(message)
 	if err != nil {
 		return "", err
 	}
 
 	return res, nil
+}
+
+// counts the difference in timestamps between neighbour blocks
+func countDifference(blocks []gopacket.Packet, counter int) time.Duration {
+	difference := blocks[counter].Metadata().Timestamp.Sub(blocks[counter-1].Metadata().Timestamp)
+	return difference
+}
+
+// sorts keys in increasing order
+func sortKeys(intervalsMap map[int]int) []int {
+	// Extract the keys into a slice
+	keys := make([]int, 0, len(intervalsMap))
+	for key := range intervalsMap {
+		keys = append(keys, key)
+	}
+
+	sort.Ints(keys)
+
+	return keys
+}
+
+// get a map with numbers of packats with each interval
+func createGraphic(blocks []gopacket.Packet) error {
+	intervalsMap := make(map[int]int)
+	for counter := 1; counter < len(blocks); counter++ {
+		interval := int(countDifference(blocks, counter).Round(250*time.Millisecond) / 1000000)
+		_, exists := intervalsMap[interval]
+		if exists {
+			intervalsMap[interval] += 1
+		} else {
+			intervalsMap[interval] = 1
+		}
+	}
+
+	err := utils.Show_gaps(intervalsMap, sortKeys(intervalsMap))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func binaryToASCII(binary string) (string, error) {
